@@ -13,6 +13,7 @@
 // nodemon index.js [index.js is the name of the file]
 
 const express = require("express");
+const { v4: uuidv4 } = require('uuid');
 const { items } = require("./data");
 
 const app = express();
@@ -28,10 +29,10 @@ app.get("/items", (request,response) => {
   response.status(200).json(items);
 })
 
-app.get("/items:id", (request,response) => {
+app.get("/items/:id", (request,response) => {
   const { id } = request.params;
 
-  const item = items.find((item) => item.id === Number(id));
+  const item = items.find((item) => String(item.id) === id);
 
   if (!item){
     response.status(404).json({
@@ -46,13 +47,72 @@ app.get("/items:id", (request,response) => {
 //   response.send("POST request received!");
 // });
 
+app.post("/items", (request, response) => {
+  const {name, description, category} = request.body;
+
+  if (!name ||!description ||!category){
+    response.status(400).json({
+      error: "Missing required fields!"
+    });
+  }
+
+  const newItem = {
+    id: uuidv4(),
+    name,
+    description,
+    category,
+  };
+
+  items.push(newItem);
+
+  response.status(201).json(items);
+});
+
 // app.put("/", (request,response) => {
 //   response.send("PUT request received!");
 // });
+app.put("/items/:id", (request, response) => {
+  const { id } = request.params;
+  const {name, description, category} = request.body;
+
+  const item = items.find((item) => String(item.id) === id);
+
+  if (!item) {
+    response.status(404).json({
+      error: "Item not found!"
+    });
+  }
+
+  if (!name && !description && !category){
+    response.status(400).json({
+      error: "Missing required fields!"
+    });
+  }
+
+  item.name = name || item.name;
+  item.description = description || item.description;
+  item.category = category || item.category;
+
+  response.status(200).json(item);
+})
 
 // app.delete("/", (request,response) => {
 //   response.send("DELETE request received!");
 // });
+app.delete("/items/:id", (request,response) => {
+  const { id } = request.params;
+
+  const item = items.find((item) => String(item.id) === id);
+
+  if (!item) {
+    response.status(404).json({
+      error: "Item not found!"
+    });
+  }
+
+  const filteredItems = items.filter((item) => String(item.id) !== id);
+  response.status(200).json(filteredItems);
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
