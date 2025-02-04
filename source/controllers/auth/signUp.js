@@ -1,6 +1,7 @@
 const validator = require("validator");
 const User = require("../../models/auth");
 const bcrypt = require("bcrypt");
+const {createToken} = require("../../utils")
 
 const signUp = async (req, res) => {
   const { email, password, username } = req.body;
@@ -36,9 +37,11 @@ const signUp = async (req, res) => {
       username,
     });
 
-    return res.status(201).json(newUser);
+    const token = createToken(newUser._id);
+
+    return res.status(201).json({token, user: newUser});
   }catch (error){
-    res.status(500).json({ message: error.message});``
+    res.status(500).json({ message: error.message});
   }
 };
 

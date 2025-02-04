@@ -1,5 +1,6 @@
 const User = require("../../models/auth");
 const bcrypt = require("bcrypt");
+const {createToken} = require("../../utils")
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
@@ -20,11 +21,9 @@ const signIn = async (req, res) => {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  return res.status(200).json({
-    _id: user._id,
-    email: user.email,
-    username: user.username,
-  });
+  const token = createToken(newUser._id);
+
+  return res.status(200).json({token, user});
 };
 
 module.exports = {
