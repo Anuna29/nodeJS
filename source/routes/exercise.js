@@ -7,6 +7,9 @@ const {
   updateExercise,
   deleteExercise,
 } = require("../controllers/exercise");
+const middleware = require("../middleware/auth")
+
+router.use(middleware);
 
 router.get("/", getAllExercises);
 router.get("/:id", getSingleExercise);

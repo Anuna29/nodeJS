@@ -1,9 +1,9 @@
 const Exercise = require('../../models/exercise');
 
 const createExercise = async (req, res) => {
-  const {name, description, type, duration, caloriesBurned} = req.body;
+  const {name, description, sets, reps, weight} = req.body;
 
-  if (!name || !description || !type || !duration || !caloriesBurned) {
+  if (!name || !description || !sets || !reps || !weight) {
     return res
     .status(400)
     .json({ message: 'All fields are required' });
@@ -13,11 +13,11 @@ const createExercise = async (req, res) => {
     const exercise = await Exercise.create({
       name,
       description,
-      type,
-      duration,
-      caloriesBurned,
+      sets,
+      reps,
+      weight
     });
-    res.status(201).json({ exercise });
+    res.status(201).json(exercise);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }

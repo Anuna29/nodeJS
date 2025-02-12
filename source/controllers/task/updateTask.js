@@ -13,14 +13,18 @@ const updateTask = async (request, response) => {
     });
   }
   try {
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return response.status(404).json({ message: "Task not found" });
+    }
+
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       { name, description, status },
       { new: true }
     );
-    if (!updatedTask) {
-      return response.status(404).json({ message: "Task not found" });
-    }
+  
     response.status(200).json(updatedTask);
   } catch (error) {
     response.status(500).json({ message: error.message });
